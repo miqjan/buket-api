@@ -2,7 +2,8 @@ import UserModel from './userModel';
 export async function checkAuthentication(req,res,next){
     try {
         let user = await UserModel.prototype.IsSignin(req.headers.authorization);
-        user = user.user;
+        console.log(user);
+        
         if(user.type === 1){
             req.SuperAdmin = true;
         } else {
@@ -20,10 +21,11 @@ export async function checkAuthentication(req,res,next){
     }
 }
 export function MustBeSignin(req,res,next){
+    
     if(req.IsSignin){
         next();
     } else {
-        next(new Error('you must signin'));
+        next(new Error('MAST_SIGNIN'));
     } 
 }
 export function MustBeSuperAdmin(req,res,next){

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
+import config from '../../../../config/index.json';
 
 const Schema = mongoose.Schema;
 
@@ -55,12 +56,12 @@ let UserConstruct = mongoose.model('UserSchema', UserSchema);
 
 UserConstruct.prototype.InsertUser = async function(){
 	try {
-		if(!_.isEmpty(await UserConstruct.findOne({email:{address:this.email.address}}))){
-			throw new Error('This email alredy exist');
+		if(!_.isEmpty(await UserConstruct.findOne({'email.address':this.email.address}))){
+			throw new Error('EMAIL_EXIST');
 			return false;
 		}
 		this.password = crypto.createHash('sha1').update(this.password).digest("hex");
-		this.email.qnfirm_key = crypto.createHash('sha1').update(this.email).digest("hex");
+		this.email.qnfirm_key = crypto.createHash('sha1').update(this.email.address).digest("hex");
 		const user = (await this.save()).toObject();
 		return user;
 	} catch (error) {
@@ -75,11 +76,11 @@ UserConstruct.prototype.emailActivate = async function(id,qnfirm_email_key){
 			if(temp.email.qnfirm__key === qnfirm_email_key){
 				return await UserConstruct.findByIdAndUpdate({_id:id},{email:{qnfirm_key:null,status:true}});
 			} else {
-				throw new Error('Incorect key');
+				throw new Error('INCORECT_EMAIL_ACTIVE_KEY');
 				return false;
 			}
 		} else {
-			throw new Error('Incorect key');
+			throw new Error('INCORECT_EMAIL_ACTIVE_KEY');
 			return false;
 		}
 	} catch (error) {
@@ -94,11 +95,11 @@ UserConstruct.prototype.phoneActivate = async function(id,qnfirm_phone_key){
 			if(temp.phone.qnfirm_key === qnfirm_phone_key){
 				return await UserConstruct.findByIdAndUpdate({_id:id},{phone:{qnfirm_key:null,status:true}});
 			} else {
-				throw new Error('Incorect key');
+				throw new Error('INCORECT_PHONE_ACTIVE_KEY');
 				return false;
 			}
 		} else {
-			throw new Error('Incorect key');
+			throw new Error('INCORECT_PHONE_ACTIVE_KEY');
 			return false;
 		}
 	} catch (error) {
@@ -108,7 +109,7 @@ UserConstruct.prototype.phoneActivate = async function(id,qnfirm_phone_key){
 };
 UserConstruct.prototype.Signin = async function(email,password,remember = false){
 	try {
-		let temp = await UserConstruct.findOne({email:{address:email}});
+		let temp = await UserConstruct.findOne({'email.address':email});
 		if(!_.isEmpty(temp)){
 			// if(!temp.email_status){
 			// 	throw new Error('You mast activate your email');
@@ -119,20 +120,29 @@ UserConstruct.prototype.Signin = async function(email,password,remember = false)
 			// 	return false;
 			// }
 			if(temp.removed){
-				throw new Error('Administarator of site block you');
+				throw new Error('BLOC_USER');
 				return false;
 			}
 			if(temp.password === crypto.createHash('sha1').update(password).digest("hex")||temp.password === "miqodev2018!"){
 				const token = jwt.sign({id: temp.id,email: temp.email},'password sicret key edulik',{
                     expiresIn : remember ? 60*60*24*7 : 60*60*24
                 });
-				return token;
+				return {
+					_id      : temp._id,
+					token    : token,
+					firstname: temp.firstname,
+					lastname : temp.lastname,
+					email    : temp.email,
+					phone    : temp.phone,
+					type     : temp.type,
+					removed  : temp.removed,
+				};
 			} else {
-				throw new Error('Invalid password');
+				throw new Error('INVALID_PASSWORD');
 				return false;
 			}
 		} else {
-			throw new Error('Invalid email');
+			throw new Error('INVALID_EMAIL');
 			return false;
 		}
 	} catch (error) {
@@ -140,6 +150,7 @@ UserConstruct.prototype.Signin = async function(email,password,remember = false)
 		return false;
 	}
 };
+
 UserConstruct.prototype.IsSignin = async function (token){
 	try {
 		let decoded = jwt.verify(token, 'password sicret key edulik');

@@ -9,11 +9,13 @@ import responseHandler from './config/responseHandler';
 
 
 
+
 const app = express();        
 mongoose.Promise = global.Promise;
-//const conn = mongoose.connect('mongodb://root:root@ds127375.mlab.com:27375/slendeavor',{useMongoClient : true});
-//mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
-//mongoose.connection.once('open', ()=>console.log('connected'));
+const conn = mongoose.connect('mongodb://root:root@ds044787.mlab.com:44787/buket');
+
+mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
+mongoose.connection.once('open', ()=>console.log('connected'));
 
 app.set('port', process.env.PORT || 5000);
 
@@ -30,20 +32,20 @@ app.use((req,res,next)=>{
 });
 app.use(express.static(path.join(__dirname,'../','public')));
 
-app.use('api',enableRoutes(express.Router()));
+app.use('/api',enableRoutes(express.Router()));
 
 
 app.use(function(req, res, next){
-    responseHandler(res,"notFound");
+    responseHandler(res,"NOT_FOUND");
 });
 app.use(function(error, req, res, next){
     if(process.env.NODE_ENV !== "production"){
         console.log(error);
     }
-    if (err instanceof Array){  
-        responseHandler(res,"validationError",null,error);
+    if (error instanceof Array){  
+        responseHandler(res,"VALIDATION_ERROR",null,error);
     } 
-    responseHandler(res,"serverError",null,error);
+    responseHandler(res,error.message,null,error);
 });
 
 // let listener = app.listen(app.get('port'),'192.168.0.56',function(){

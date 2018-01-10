@@ -2,9 +2,10 @@ import controller from "./authController";
 import {checkAuthentication,MustBeSignin,NotMustBeSignin} from './helpers';
 
 export default router => {
+    
     router.use(checkAuthentication);
-
-    router.get("/issignin", MustBeSignin, controller.isSignIn);
+    
+    router.get("/is-sign-in", MustBeSignin, controller.isSignIn);
 
     router.post("/sign-in", NotMustBeSignin, controller.signIn);
 

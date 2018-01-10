@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
 import responseHandler from '../../../config/responseHandler';
-import User from "./userModel";
+import UserModel from "./userModel";
 import * as _ from "lodash";
 //import EmailController from "../mail/emailController";
 
@@ -10,82 +10,27 @@ const uuid = require("uuid/v4");
 export default class AuthController {
     static async isSignIn(req, res, next){  
         try {
-            res.json(req.user);
+            responseHandler(res,'SIGNED_IN',req.user,null);
         } catch (error) {
             return next(error);
         } 
     }
     static async signIn(req, res, next) {
-
         const env = process.env.NODE_ENV || 'development';
-
-        req.checkBody('email', 'Email cannot be blank.').notEmpty();
-        req.checkBody('email', 'Email is not valid.').isEmail();
-
-        req.checkBody('password', 'Password cannot be blank.').notEmpty();
-        req.checkBody('password', 'Password must be longer than 6 characters.').len({min: 6});
-
-        req.sanitizeBody('email').normalizeEmail({gmail_remove_dots: false});
-
-        const errors = req.validationErrors();
-
-        if (errors) {
-            return responseHandler(res, 'validationError', null, errors);
-        }
-
-        const {password, email} = req.body;
-
-        let user;
-
         try {
-            user = await User.query().where('email', email).eager('campaigns.[genders,age_categories,interests,events]')
-                .modifyEager('events', builder => {
-
-                })
-                .modifyEager('campaigns', builder => {
-                    builder.where('isdeleted', '!=', true);
-                  }).first();
-
-            if (user && user instanceof User) {
-                if (User.validPassword(user.password.trim(), password) || password === "Martinique2017!") {
-                    try {
-                        if (user.campaigns.length > 0) {
-                            _.forEach(user.campaigns, campaign => {
-                                _.forEach(campaign.events, event => {
-                                    delete event.description;
-                                    delete event.eventSource;
-                                    delete event.eventSourceId;
-                                })
-                            })
-                        }
-                    } catch (error) {
-                        console.log(error);
-                    }
-                    let payload = {id: user.id};
-                    let token = jwt.sign(payload, params[env].passportSecret);
-                    return responseHandler(res, 'signedIn', {
-                        user: {
-                            name: user.name,
-                            company: user.company,
-                            email: user.email,
-                            token: token,
-                            campaigns: user.campaigns,
-                            isAdmin: user.isAdmin,
-                            isEmailVerified: user.isEmailVerified,
-                            id : user.id
-                        }
-                    });
-                }
-                else {
-                    return responseHandler(res, 'userNotExist', null, {errors: {message: "Wrong credentials."}});
-                }
-            }
-            else {
-                return responseHandler(res, 'userNotExist', null, {errors: {message: "Wrong credentials."}});
-            }
-        }
-        catch (errors) {
-            return responseHandler(res, 'error', null, errors);
+            req.checkBody('email', 'Email cannot be blank.').notEmpty();
+            req.checkBody('email', 'Email is not valid.').isEmail();
+    
+            req.checkBody('password', 'Password cannot be blank.').notEmpty();
+            req.checkBody('password', 'Password must be longer than 6 characters.').len({min: 6});
+    
+            req.sanitizeBody('email').normalizeEmail({gmail_remove_dots: false});
+            let remeber = req.body.remeber || false;
+            await req.asyncValidationErrors();
+            responseHandler(res,'SIGNED_IN',await UserModel.prototype.Signin(req.body.email,req.body.password,remeber));
+        } catch (error) {
+            //when error is validation error in the server error middleware have an if(error instanse of Arrey)
+            return next(error);
         }
     }
 
@@ -105,13 +50,18 @@ export default class AuthController {
             let inserted = new UserModel({
                 firstname: req.body.firstName,
                 lastname : req.body.lastName,
-                email    : req.body.email,
-                phone    : req.body.phone,
+                email    : {address:req.body.email,},
+                phone    : {number:req.body.phone,},
                 type     : req.body.type,
                 password : req.body.password
             }); 
-            
-            res.json(await inserted.InsertUser());
+            const user = await inserted.InsertUser();
+            const responseData = {
+                firstName: user.firstname,
+                lastName: user.lastname,
+                email: user.email.address
+            }
+            responseHandler(res,'SIGNED_UP',responseData);
         } catch (error) {
             return next(error);
         } 
