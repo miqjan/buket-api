@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "checkJs" : true,
+        "allowSyntheticDefaultImports": true,
+        "baseUrl" : "./node_modules/@types"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

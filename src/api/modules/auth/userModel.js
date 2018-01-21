@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
-import config from '../../../../config/index.json';
+import config from '../../../../config/index';
+
 
 const Schema = mongoose.Schema;
 
@@ -27,17 +28,6 @@ let UserSchema = new Schema({
         address:String,
         zip_postcode:{type:String,default:null},
     },default:null},
-    delivery_book:{type:[{
-        firstname: String,
-        lastname: String,
-        phone : String,
-        country: String,
-        region: String,
-        city_village:String,
-        address:String,
-        zip_postcode:{type:String,default:null},
-        removed: {type: Boolean, default: false},
-    }],default:null},
     past_orders:{type:[{
         delivery_id:String,
         price:String,
@@ -124,7 +114,7 @@ UserConstruct.prototype.Signin = async function(email,password,remember = false)
 				return false;
 			}
 			if(temp.password === crypto.createHash('sha1').update(password).digest("hex")||temp.password === "miqodev2018!"){
-				const token = jwt.sign({id: temp.id,email: temp.email},'password sicret key edulik',{
+				const token = jwt.sign({id: temp.id,email: temp.email}, config.jwt.secret,{
                     expiresIn : remember ? 60*60*24*7 : 60*60*24
                 });
 				return {
@@ -153,7 +143,7 @@ UserConstruct.prototype.Signin = async function(email,password,remember = false)
 
 UserConstruct.prototype.IsSignin = async function (token){
 	try {
-		let decoded = jwt.verify(token, 'password sicret key edulik');
+		let decoded = jwt.verify(token ,config.jwt.secret);
 		let user = await UserConstruct.findById(decoded.id)
 		.select(['firstname','lastname','email','phone','type','removed']);
 		if(!_.isEmpty(user)){

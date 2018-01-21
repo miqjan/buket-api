@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel ./src --presets babel-preset-es2015 --out-dir dist",
-    "start-prod": "node ./dist/server.js",
-    "start": "nodemon --exec babel-node -- ./src/server.js"
+    "start-prod": "node server.js",
+    "start": "nodemon --exec babel-node -- server.js"
   },
   "repository": {
     "type": "git",
