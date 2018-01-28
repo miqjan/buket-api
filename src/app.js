@@ -73,6 +73,7 @@ class Application {
 
     setErrorHandler() {
         this.app.use((err, req, res, next) => {
+            console.log(err.message);
             return responseHandler(res,err.message,null,err);
         });
     }

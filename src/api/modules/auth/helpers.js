@@ -1,9 +1,7 @@
-import UserModel from './userModel';
+import UserModel from '../user/userModel';
 export async function checkAuthentication(req,res,next){
     try {
         let user = await UserModel.prototype.IsSignin(req.headers.authorization);
-        console.log(user);
-        
         if(user.type === 1){
             req.SuperAdmin = true;
         } else {
