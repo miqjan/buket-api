@@ -60,4 +60,4 @@ typings/
 #self
 .idea/
 .vscode/
-config/
+config/index.js
