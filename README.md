@@ -1,3 +1,5 @@
+<pre>
+<code>
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33,4 +35,4 @@ exports.default = function (config) {
         returnConfig = config.production;
     }
     return returnConfig;
-}(config, process.env.NODE_ENV);
+}(config, process.env.NODE_ENV); </code> </pre> 
