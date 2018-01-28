@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
 import responseHandler from '../../../config/responseHandler';
-import UserModel from "./userModel";
+import UserModel from "../user/userModel";
 import * as _ from "lodash";
 //import EmailController from "../mail/emailController";
 
