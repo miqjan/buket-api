@@ -12,7 +12,7 @@ var config = {
             secret: "jwt_secret",
         },
         app: {
-            baseUrl: "http://localhost:3000/",
+            baseUrl: "http://localhost:5000/",
             port: 5000,
         },
     },
