@@ -16,7 +16,7 @@ export default class CategoriesController {
             return next(error);
         } 
     }
-    static async setCategories(req, res, next) {
+    static async setCategory(req, res, next) {
 
   
 
@@ -67,7 +67,6 @@ export default class CategoriesController {
                 throw new Error("type mast be PARENT or CHILDREN")
             }
         } catch (error) {
-            throw (error);
             return next(error);
         }
     }
