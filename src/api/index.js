@@ -2,17 +2,17 @@ import * as express from 'express';
 
 import AuthModule from './modules/auth/authModule';
 import CategoriesModule from './modules/categories/categoriesModule';
+import ProductsModule from './modules/products/productsModule';
 
 export default (router) => {
-    /**@type {Array} */
-    let modules = [];
-    /**@type {{}} */
-    let auth = AuthModule(router);
-    let categorys = CategoriesModule(router);
+    const modules = [];
+    const auth = AuthModule(router);
+    const categorys = CategoriesModule(router);
+    const products = ProductsModule(router);
    
     modules.push(auth);
     modules.push(categorys);
-    console.log(`loading modules`);
+    modules.push(products);
     modules.forEach((module) => {
         module.createEndpoints();
     });
