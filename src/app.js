@@ -7,6 +7,8 @@ import expressValidator  from 'express-validator';
 import enableRoutes from './api'
 import responseHandler from './config/responseHandler';
 import config from '../config';
+import { NotFound } from './config/errors';
+
 
 class Application {
     constructor (app,router,mongoClient) {
@@ -19,6 +21,7 @@ class Application {
         this.setParams();
         this.setRouter();
         this.setErrorHandler();
+        this.set404Handler();
     }
 
     configApp() {
@@ -28,7 +31,7 @@ class Application {
         this.app.use(expressValidator());
         this.app.use((req,res,next)=>{
             res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader('Access-Control-Allow-Methods', 'GET,POST');
+            res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT');
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
             next();
         });
@@ -70,11 +73,16 @@ class Application {
         this.router = express.Router();
         this.app.use('/api',enableRoutes(this.router));
     }
-
+    set404Handler(){
+        this.app.use((req, res, next) => {
+            const notFound = new NotFound("not found");
+            res.status(notFound.status).json({status: "Error", message: notFound.message, data: null, errors: notFound.errors});
+        });
+    }
     setErrorHandler() {
-        this.app.use((err, req, res, next) => {
-            console.log(err.message);
-            return responseHandler(res,err.message,null,err);
+        this.app.use((error, req, res, next) => {
+            console.log(error.message);
+            res.status(error.status||500).json({status: "Error", message: error.message, data: null,errors: error.errors });
         });
     }
 }

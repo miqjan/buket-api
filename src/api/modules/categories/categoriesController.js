@@ -5,7 +5,10 @@ import uuid from 'uuid';
 import responseHandler from '../../../config/responseHandler';
 import CategoriesModel from "./categoriesModel";
 import config from '../../../../config/index';
+import { ValidationError, BadRequest } from '../../../config/errors/index';
 import * as _ from "lodash";
+
+
 
 export default class CategoriesController {
     static async getAllCategories(req, res, next){  
@@ -13,7 +16,7 @@ export default class CategoriesController {
             const categorys = await CategoriesModel.find({type: 'PARENT'}).populate('subCategories').exec();
             responseHandler(res,'SUCCESS',categorys,null);
         } catch (error) {
-            return next(error);
+            return next(new BadRequest(error));
         } 
     }
     static async setCategory(req, res, next) {
@@ -67,7 +70,7 @@ export default class CategoriesController {
                 throw new Error("type mast be PARENT or CHILDREN")
             }
         } catch (error) {
-            return next(error);
+            return next(new ValidationError(error));
         }
     }
     

@@ -6,7 +6,9 @@ import responseHandler from '../../../config/responseHandler';
 import ProductsModel from "./productsModel";
 import CategoriesModel from "../categories/categoriesModel";
 import config from '../../../../config/index';
+import { AuthError, BadRequest, ValidationError } from '../../../config/errors/index';
 import * as _ from "lodash";
+
 
 export default class ProductsController {
     static async getAllProducts(req, res, next){  
@@ -14,7 +16,7 @@ export default class ProductsController {
             const categorys = await ProductsModel.find().exec();
             responseHandler(res,'SUCCESS',categorys,null);
         } catch (error) {
-            return next(error);
+            return next(new BadRequest(error));
         } 
     }
     static async getProductsByCategory (req,res,next) {
@@ -29,7 +31,7 @@ export default class ProductsController {
             const products = await ProductsModel.find({category: categoryId}).limit(limit).exec();
             responseHandler(res,'SUCCESS',products,null);
         } catch (error) {
-            return next(error);
+            return next(new ValidationError(error));
         }
         
     }
@@ -64,7 +66,7 @@ export default class ProductsController {
                 throw new Error("Category by id dose not exist");
             }
         } catch (error) {
-            return next(error);
+            return next(new ValidationError(error));
         }
     }
     

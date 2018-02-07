@@ -3,6 +3,8 @@ import * as jwt from 'jsonwebtoken';
 import responseHandler from '../../../config/responseHandler';
 import UserModel from "../user/userModel";
 import * as _ from "lodash";
+import { AuthError, ValidationError } from '../../../config/errors/index';
+
 //import EmailController from "../mail/emailController";
 
 const uuid = require("uuid/v4");
@@ -16,37 +18,33 @@ export default class AuthController {
         } 
     }
     static async signIn(req, res, next) {
-        const env = process.env.NODE_ENV || 'development';
+        req.checkBody('email', 'Email cannot be blank.').notEmpty();
+        req.checkBody('email', 'Email is not valid.').isEmail();
+
+        req.checkBody('password', 'Password cannot be blank.').notEmpty();
+        req.checkBody('password', 'Password must be longer than 6 characters.').len({min: 6});
+
+        req.sanitizeBody('email').normalizeEmail({gmail_remove_dots: false});
         try {
-            req.checkBody('email', 'Email cannot be blank.').notEmpty();
-            req.checkBody('email', 'Email is not valid.').isEmail();
-    
-            req.checkBody('password', 'Password cannot be blank.').notEmpty();
-            req.checkBody('password', 'Password must be longer than 6 characters.').len({min: 6});
-    
-            req.sanitizeBody('email').normalizeEmail({gmail_remove_dots: false});
             let remeber = req.body.remeber || false;
             await req.asyncValidationErrors();
             responseHandler(res,'SIGNED_IN',await UserModel.prototype.Signin(req.body.email,req.body.password,remeber));
         } catch (error) {
             //when error is validation error in the server error middleware have an if(error instanse of Arrey)
-            return next(error);
+            return next(new ValidationError(error));
         }
     }
 
     static async signUp(req, res, next) {
-
-        const env = process.env.NODE_ENV || 'development';
         req.sanitizeBody('email').normalizeEmail({gmail_remove_dots: false});
+        req.checkBody('firstName', 'Firstname cannot be blank.').notEmpty();
+        req.checkBody('lastName', 'Lastname cannot be blank.').notEmpty();
+        req.checkBody('email', 'Incorect email address').isEmail();
+        req.checkBody('phone','Incorect phone number').isMobilePhone('any');
+        req.checkBody('password', 'Password cannot be blank.').notEmpty();
+        req.checkBody('password', 'Password must be longer than 6 characters.').len({min: 6});
         try {
-            req.checkBody('firstName', 'Firstname cannot be blank.').notEmpty();
-            req.checkBody('lastName', 'Lastname cannot be blank.').notEmpty();
-            req.checkBody('email', 'Incorect email address').isEmail();
-            req.checkBody('phone','Incorect phone number').isMobilePhone('any');
-            req.checkBody('password', 'Password cannot be blank.').notEmpty();
-            req.checkBody('password', 'Password must be longer than 6 characters.').len({min: 6});
             await req.asyncValidationErrors();
-           
             let inserted = new UserModel({
                 firstname: req.body.firstName,
                 lastname : req.body.lastName,
@@ -63,7 +61,7 @@ export default class AuthController {
             }
             responseHandler(res,'SIGNED_UP',responseData);
         } catch (error) {
-            return next(error);
+            return next(new ValidationError(error));
         } 
     }
 

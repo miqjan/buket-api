@@ -1,4 +1,6 @@
 import UserModel from '../user/userModel';
+import { AuthError } from '../../../config/errors';
+
 export async function checkAuthentication(req,res,next){
     try {
         let user = await UserModel.prototype.IsSignin(req.headers.authorization);
@@ -23,20 +25,20 @@ export function MustBeSignin(req,res,next){
     if(req.IsSignin){
         next();
     } else {
-        next(new Error('MAST_SIGNIN'));
+        next(new AuthError('Must be sign in'));
     } 
 }
 export function MustBeSuperAdmin(req,res,next){
     if(req.IsSignin && req.SuperAdmin){
         next();
     } else {
-        next(new Error('you must be Super Admin'));
+        next(new AuthError('you must be Super Admin'));
     } 
 }
 export function NotMustBeSignin(req,res,next){
     if(!req.IsSignin){
         next();
     } else {
-        next(new Error('you are signin'));
+        next(new AuthError('you are signin'));
     } 
 }
