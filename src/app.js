@@ -82,7 +82,7 @@ class Application {
     setErrorHandler() {
         this.app.use((error, req, res, next) => {
             console.log(error.message);
-            res.status(error.status||500).json({status: "Error", message: error.message, data: null,errors: error.errors });
+            res.status(error.status||500).json({status: "Error", message: error.message, data: null, errors: error.errors });
         });
     }
 }
