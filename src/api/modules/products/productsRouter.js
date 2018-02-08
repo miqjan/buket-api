@@ -1,15 +1,15 @@
-import controller from "./productsController";
+import controller from './productsController';
 import {checkAuthentication,MustBeSuperAdmin} from '../auth/helpers';
 
 export default router => {
 
     router.use(checkAuthentication);
 
-    router.get("/", MustBeSuperAdmin, controller.getAllProducts);
+    router.get('/', MustBeSuperAdmin, controller.getAllProducts);
 
-    router.post("/", MustBeSuperAdmin, controller.setProduct);
+    router.post('/', MustBeSuperAdmin, controller.setProduct);
 
-    router.get("/:categoryId", controller.getProductsByCategory);
+    router.get('/:categoryId', controller.getProductsByCategory);
 
     //router.post("/test",controller.test);
 

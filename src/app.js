@@ -4,14 +4,13 @@ import mongoose from 'mongoose';
 import path from 'path';
 import expressValidator  from 'express-validator';
 
-import enableRoutes from './api'
-import responseHandler from './config/responseHandler';
+import enableRoutes from './api';
 import config from '../config';
 import { NotFound } from './config/errors';
 
 
 class Application {
-    constructor (app,router,mongoClient) {
+    constructor () {
         this.app = express();
         this.initApp();
     }
@@ -44,20 +43,29 @@ class Application {
         const connection = mongoose.connection;
         
         connection.on('error', function(error) {
+            
+            
+            // eslint-disable-next-line no-console
             console.error('Error in MongoDb connection: ' + error);
+          
             mongoose.disconnect();
         });
         connection.once('open', function() {
+            // eslint-disable-next-line no-console
             console.log('connection open');
         });
         connection.on('connected', function() {
+            // eslint-disable-next-line no-console
             console.log('connected!');
         });
         connection.on('reconnected', function () {
+            // eslint-disable-next-line no-console
             console.log('reconnected');
         });
         connection.on('disconnected', function() {
+            // eslint-disable-next-line no-console
             console.log('disconnected');
+            // eslint-disable-next-line no-console
             console.log('dbURI is: '+ config.dbConnectUrl);
             mongoose.connect(config.dbConnectUrl ,{useMongoClient: true, autoReconnect: true});
         });
@@ -74,15 +82,16 @@ class Application {
         this.app.use('/api',enableRoutes(this.router));
     }
     set404Handler(){
-        this.app.use((req, res, next) => {
-            const notFound = new NotFound("not found");
-            res.status(notFound.status).json({status: "Error", message: notFound.message, data: null, errors: notFound.errors});
+        this.app.use((req, res) => {
+            const notFound = new NotFound('not found');
+            res.status(notFound.status).json({status: 'Error', message: notFound.message, data: null, errors: notFound.errors});
         });
     }
     setErrorHandler() {
-        this.app.use((error, req, res, next) => {
+        this.app.use((error, req, res) => {
+            // eslint-disable-next-line no-console
             console.log(error.message);
-            res.status(error.status||500).json({status: "Error", message: error.message, data: null, errors: error.errors });
+            res.status(error.status||500).json({status: 'Error', message: error.message, data: null, errors: error.errors });
         });
     }
 }

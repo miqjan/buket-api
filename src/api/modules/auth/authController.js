@@ -1,13 +1,10 @@
-import * as express from 'express';
-import * as jwt from 'jsonwebtoken';
 import responseHandler from '../../../config/responseHandler';
-import UserModel from "../user/userModel";
-import * as _ from "lodash";
-import { AuthError, ValidationError } from '../../../config/errors/index';
+import UserModel from '../user/userModel';
+import { ValidationError } from '../../../config/errors/index';
 
 //import EmailController from "../mail/emailController";
 
-const uuid = require("uuid/v4");
+//const uuid = require("uuid/v4");
 
 export default class AuthController {
     static async isSignIn(req, res, next){  
@@ -58,7 +55,7 @@ export default class AuthController {
                 firstName: user.firstname,
                 lastName: user.lastname,
                 email: user.email.address
-            }
+            };
             responseHandler(res,'SIGNED_UP',responseData);
         } catch (error) {
             return next(new ValidationError(error));
@@ -70,33 +67,33 @@ export default class AuthController {
         responseHandler(res, 'signedOut');
     }
 
-    static async verifyEmail(req, res) {
-        const { emailAuthToken } = req.params;
-        const env= process.env.NODE_ENV || 'development';
-        let userData;
-        try {
-            // TODO use patch and fetch
-            await User.query().patch({isEmailVerified : true}).where("emailAuthToken", emailAuthToken);
-            userData = await User.query().where("emailAuthToken", emailAuthToken);
-            const user = userData[0];
-            if (user && user instanceof User) {
-                let payload = {id: user.id};
-                let token = jwt.sign(payload, params[env].passportSecret);
-                return responseHandler(res, 'success', {
-                    user: {
-                        name: user.name,
-                        lastName: user.lastName,
-                        company: user.company,
-                        email: user.email,
-                        token: token,
-                        id : user.id
-                    }
-                }, null);
-            } else {
-                return responseHandler(res, 'userNotExist', null, {errors: {message: "Invalid auth token."}});
-            }
-        } catch(error) {
-            return responseHandler(res, 'error', null, error);
-        }
-    }
+    // static async verifyEmail(req, res) {
+    //     const { emailAuthToken } = req.params;
+    //     const env= process.env.NODE_ENV || 'development';
+    //     let userData;
+    //     try {
+    //         // TODO use patch and fetch
+    //         await User.query().patch({isEmailVerified : true}).where("emailAuthToken", emailAuthToken);
+    //         userData = await User.query().where("emailAuthToken", emailAuthToken);
+    //         const user = userData[0];
+    //         if (user && user instanceof User) {
+    //             let payload = {id: user.id};
+    //             let token = jwt.sign(payload, params[env].passportSecret);
+    //             return responseHandler(res, 'success', {
+    //                 user: {
+    //                     name: user.name,
+    //                     lastName: user.lastName,
+    //                     company: user.company,
+    //                     email: user.email,
+    //                     token: token,
+    //                     id : user.id
+    //                 }
+    //             }, null);
+    //         } else {
+    //             return responseHandler(res, 'userNotExist', null, {errors: {message: "Invalid auth token."}});
+    //         }
+    //     } catch(error) {
+    //         return responseHandler(res, 'error', null, error);
+    //     }
+    // }
 }

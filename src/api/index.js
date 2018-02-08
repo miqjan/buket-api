@@ -1,5 +1,3 @@
-import * as express from 'express';
-
 import AuthModule from './modules/auth/authModule';
 import CategoriesModule from './modules/categories/categoriesModule';
 import ProductsModule from './modules/products/productsModule';
