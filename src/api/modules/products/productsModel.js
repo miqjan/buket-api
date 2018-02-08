@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 let ProductsSchema = new Schema({
-	name: {type: {
+    name: {type: {
         ru: {type: String, default : ''},
         am: {type: String, default : ''},
         en: {type: String, default : ''}
     }},
-    "kayWord" : {type: {
+    kayWord : {type: {
         ru: {type: String, default : ''},
         am: {type: String, default : ''},
         en: {type: String, default : ''}

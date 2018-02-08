@@ -1,13 +1,12 @@
-import * as express from 'express';
 import fs from 'fs';
 import path from 'path';
 import uuid from 'uuid';
 import responseHandler from '../../../config/responseHandler';
-import ProductsModel from "./productsModel";
-import CategoriesModel from "../categories/categoriesModel";
-import config from '../../../../config/index';
-import { AuthError, BadRequest, ValidationError } from '../../../config/errors/index';
-import * as _ from "lodash";
+import ProductsModel from './productsModel';
+import CategoriesModel from '../categories/categoriesModel';
+//import config from '../../../../config/index';
+import { BadRequest, ValidationError } from '../../../config/errors/index';
+import * as _ from 'lodash';
 
 
 export default class ProductsController {
@@ -51,19 +50,19 @@ export default class ProductsController {
                 let data = matches[2];
                 let buffer = new Buffer(data, 'base64');
                 let imgName = uuid()+'.'+ ext;
-                await fs.writeFileSync(path.join(__dirname,'../../../../',"public/images/products/",imgName),buffer);
+                await fs.writeFileSync(path.join(__dirname,'../../../../','public/images/products/',imgName),buffer);
                 let resulteProduct = await (new ProductsModel({
                     name: JSON.parse(name),
                     kayWord: JSON.parse(keyWords),
                     price: price,
                     category : categoryId,
-                    image_url: "/images/categorys/"+ imgName
+                    image_url: '/images/categorys/'+ imgName
                 })).save();
                 category.products.push(resulteProduct._id);
                 await category.save();
                 responseHandler(res,'SUCCESS',resulteProduct,null);
             }else{
-                throw new Error("Category by id dose not exist");
+                throw new Error('Category by id dose not exist');
             }
         } catch (error) {
             return next(new ValidationError(error));

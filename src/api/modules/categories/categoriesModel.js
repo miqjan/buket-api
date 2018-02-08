@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 let CategoriesSchema = new Schema({
-	name: {type: {
+    name: {type: {
         ru: {type: String, default : ''},
         am: {type: String, default : ''},
         en: {type: String, default : ''}
@@ -12,12 +12,11 @@ let CategoriesSchema = new Schema({
     url: {type: String},
     image_url: {type: String},
     subCategories : [{ type: Schema.Types.ObjectId, ref: 'CategoriesSchema', default : null}],
-	create_at: {type: Date, default: Date.now},
-	type: {type: String , enum :['PARENT','CHILDREN'], default: 'PARENT'},
+    create_at: {type: Date, default: Date.now},
+    type: {type: String , enum :['PARENT','CHILDREN'], default: 'PARENT'},
     parent: {type:  Schema.Types.ObjectId, ref: 'CategoriesSchema', default : null },
     products: [{ type: Schema.Types.ObjectId, ref: 'ProductsSchema', default : null}]
 });
-
 
 // CategoriesSchema.virtual('subCategories', {
 //     ref: 'CategoriesSchema',

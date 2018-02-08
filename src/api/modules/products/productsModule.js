@@ -3,7 +3,6 @@ import * as express from 'express';
 
 class ProductsModule {
     constructor(apiRouter) {
-        
         this.router = express.Router();
         this.apiRouter = apiRouter;
     }
