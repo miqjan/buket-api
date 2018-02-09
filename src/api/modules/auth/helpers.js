@@ -25,20 +25,20 @@ export function MustBeSignin(req,res,next){
     if(req.IsSignin){
         next();
     } else {
-        next(new AuthError('Must be sign in'));
+        return next(new AuthError('Must be sign in'));
     } 
 }
 export function MustBeSuperAdmin(req,res,next){
     if(req.IsSignin && req.SuperAdmin){
         next();
     } else {
-        next(new AuthError('you must be Super Admin'));
+        return next(new AuthError('you must be Super Admin'));
     } 
 }
 export function NotMustBeSignin(req,res,next){
     if(!req.IsSignin){
         next();
     } else {
-        next(new AuthError('you are signin'));
+        return next(new AuthError('you are signin'));
     } 
 }

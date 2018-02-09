@@ -27,8 +27,9 @@ export default class AuthController {
             await req.asyncValidationErrors();
             responseHandler(res,'SIGNED_IN',await UserModel.prototype.Signin(req.body.email,req.body.password,remeber));
         } catch (error) {
+           
             //when error is validation error in the server error middleware have an if(error instanse of Arrey)
-            return next(new ValidationError(error));
+            return next(error);
         }
     }
 
@@ -58,7 +59,7 @@ export default class AuthController {
             };
             responseHandler(res,'SIGNED_UP',responseData);
         } catch (error) {
-            return next(new ValidationError(error));
+            return next(error);
         } 
     }
 

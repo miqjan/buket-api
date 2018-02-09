@@ -6,7 +6,8 @@ import expressValidator  from 'express-validator';
 
 import enableRoutes from './api';
 import config from '../config';
-import { NotFound } from './config/errors';
+import { NotFound, ValidationError } from './config/errors';
+import * as _ from 'lodash';
 
 
 class Application {
@@ -26,8 +27,13 @@ class Application {
     configApp() {
         this.app.use(bodyParser.json({limit: '50mb'}));
         this.app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-        
-        this.app.use(expressValidator());
+        this.app.use(expressValidator(
+            {
+                errorFormatter: (param, msg, value, location)=>{
+                    return {param: param, message: msg, value: value, location: location};
+                },
+            }
+        ));
         this.app.use((req,res,next)=>{
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT');
@@ -88,9 +94,11 @@ class Application {
         });
     }
     setErrorHandler() {
-        this.app.use((error, req, res) => {
+        this.app.use((error, req, res , next) => {
             // eslint-disable-next-line no-console
-            console.log(error.message);
+            if( _.isArray(error) ){
+                error = new ValidationError(error);
+            }
             res.status(error.status||500).json({status: 'Error', message: error.message, data: null, errors: error.errors });
         });
     }

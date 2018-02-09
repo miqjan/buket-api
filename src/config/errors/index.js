@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 export class AuthError extends Error {
     constructor(errors = null,message = 'AUTH_ERROR',status = 401) {
         super();
@@ -30,7 +31,7 @@ export class NotFound extends Error {
 
 export class ValidationError extends Error {
 
-    constructor(errors = null,message = 'VALIDATION_ERROR',status = 400) {
+    constructor(errors = null,message = 'VALIDATION_ERROR',status = 422) {
         super();
         this.message = message;
         this.errors = errors;

@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
 import config from '../../../../config/index';
+import { AuthError , BadRequest } from '../../../config/errors/index';
 
 
 const Schema = mongoose.Schema;
@@ -47,7 +48,7 @@ let UserConstruct = mongoose.model('UserSchema', UserSchema);
 UserConstruct.prototype.InsertUser = async function(){
     try {
         if (!_.isEmpty(await UserConstruct.findOne({ 'email.address': this.email.address }))) {
-            throw new Error('EMAIL_EXIST');
+            throw new BadRequest('Email exist ');
         }
         this.password = crypto.createHash('sha1').update(this.password).digest('hex');
         this.email.qnfirm_key = crypto.createHash('sha1').update(this.email.address).digest('hex');
@@ -104,7 +105,7 @@ UserConstruct.prototype.Signin = async function(email,password,remember = false)
             // 	return false;
             // }
             if (temp.removed) {
-                throw new Error('BLOC_USER');
+                throw new new AuthError(null, 'Administarator of site block you');
             }
             if (temp.password === crypto.createHash('sha1').update(password).digest('hex') || temp.password === 'miqodev2018!') {
                 const token = jwt.sign({ id: temp.id, email: temp.email }, config.jwt.secret, {
@@ -121,10 +122,10 @@ UserConstruct.prototype.Signin = async function(email,password,remember = false)
                     removed: temp.removed,
                 };
             } else {
-                throw new Error('INVALID_PASSWORD');
+                throw new AuthError(null, 'User not exist');
             }
         } else {
-            throw new Error('INVALID_EMAIL');
+            throw new AuthError(null, 'User not exist');
         }
     } catch (error) {
         throw error;
@@ -138,11 +139,11 @@ UserConstruct.prototype.IsSignin = async function (token){
             .select(['firstname', 'lastname', 'email', 'phone', 'type', 'removed']);
         if (!_.isEmpty(user)) {
             if (user.removed) {
-                throw new Error('Administarator of site block you');
+                throw new AuthError(null,'Administarator of site block you');
             }
             return user;
         } else {
-            throw new Error('Incorect token');
+            throw new AuthError(null,'Incorect token');
         }
     } catch (err) {
         throw err;
