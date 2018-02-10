@@ -26,8 +26,8 @@ export default class ProductsController {
         try {
             await req.asyncValidationErrors();
             const categoryId = req.params.categoryId;
-            const limit = req.params.limit || 10;
-            const products = await ProductsModel.find({category: categoryId}).limit(limit).exec();
+            const limit = req.params.limit || 12;
+            const products = await ProductsModel.find({ category: categoryId }).limit(limit).exec();
             responseHandler(res,'SUCCESS',products,null);
         } catch (error) {
             return next(new ValidationError(error));
@@ -42,8 +42,8 @@ export default class ProductsController {
         req.checkBody('categoryId', 'Parent can not be blank.').notEmpty().isMongoId();
         try {
             await req.asyncValidationErrors();
-            const { categoryId, name, price, keyWords} = req.body;
-            const category = await CategoriesModel.findOne({_id: categoryId, type: 'CHILDREN'}).exec();
+            const { categoryId, name, price, keyWords } = req.body;
+            const category = await CategoriesModel.findOne({ _id: categoryId, type: 'CHILDREN' }).exec();
             if(!_.isEmpty(category)){
                 let matches = req.body.image.match(/^data:.+\/(.+);base64,(.*)$/);
                 let ext = matches[1];
@@ -56,7 +56,7 @@ export default class ProductsController {
                     kayWord: JSON.parse(keyWords),
                     price: price,
                     category : categoryId,
-                    image_url: '/images/categorys/'+ imgName
+                    image_url: '/images/products/'+ imgName
                 })).save();
                 category.products.push(resulteProduct._id);
                 await category.save();
