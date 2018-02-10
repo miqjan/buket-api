@@ -24,17 +24,17 @@ class Application {
     }
 
     configApp() {
-        this.app.use(bodyParser.json({limit: '50mb'}));
-        this.app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+        this.app.use( bodyParser.json( {limit: '50mb'} ) );
+        this.app.use( bodyParser.urlencoded( {limit: '50mb', extended: true} ) );
         
-        this.app.use(expressValidator());
-        this.app.use((req,res,next)=>{
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT');
-            res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        this.app.use( expressValidator() );
+        this.app.use( ( req, res, next )=>{
+            res.setHeader( 'Access-Control-Allow-Origin', '*' );
+            res.setHeader( 'Access-Control-Allow-Methods', 'GET,POST,PUT' );
+            res.setHeader( 'Access-Control-Allow-Headers', 'Content-Type, Authorization' );
             next();
-        });
-        this.app.use(express.static(path.join(__dirname,'../','public')));
+        } );
+        this.app.use( express.static( path.join( __dirname,'../','public' ) ) );
     }
 
     dbConfig() {
@@ -42,57 +42,58 @@ class Application {
         mongoose.Promise = global.Promise;
         const connection = mongoose.connection;
         
-        connection.on('error', function(error) {
+        connection.on( 'error', function( error ) {
             
             
             // eslint-disable-next-line no-console
-            console.error('Error in MongoDb connection: ' + error);
+            console.error( 'Error in MongoDb connection: ' + error );
           
             mongoose.disconnect();
-        });
-        connection.once('open', function() {
+        } );
+        connection.once( 'open', function() {
             // eslint-disable-next-line no-console
-            console.log('connection open');
-        });
-        connection.on('connected', function() {
+            console.log( 'connection open' );
+        } );
+        connection.on( 'connected', function() {
             // eslint-disable-next-line no-console
-            console.log('connected!');
-        });
-        connection.on('reconnected', function () {
+            console.log( 'connected!' );
+        } );
+        connection.on( 'reconnected', function () {
             // eslint-disable-next-line no-console
-            console.log('reconnected');
-        });
-        connection.on('disconnected', function() {
+            console.log( 'reconnected' );
+        } );
+        connection.on( 'disconnected', function() {
             // eslint-disable-next-line no-console
-            console.log('disconnected');
+            console.log( 'disconnected' );
             // eslint-disable-next-line no-console
-            console.log('dbURI is: '+ config.dbConnectUrl);
-            mongoose.connect(config.dbConnectUrl ,{useMongoClient: true, autoReconnect: true});
-        });
+            console.log( 'dbURI is: '+ config.dbConnectUrl );
+            mongoose.connect( config.dbConnectUrl ,{useMongoClient: true, autoReconnect: true} );
+        } );
 
-        this.mongoClient = mongoose.connect(config.dbConnectUrl ,{useMongoClient: true});
+        this.mongoClient = mongoose.connect( config.dbConnectUrl ,{useMongoClient: true} );
     }
 
     setParams() {
-        this.app.set('port', process.env.PORT || 5000);//it not use port coming from config file
+        this.app.set( 'port', process.env.PORT || 5000 );//it not use port coming from config file
     }
 
     setRouter() {
         this.router = express.Router();
-        this.app.use('/api',enableRoutes(this.router));
+        this.app.use( '/api', enableRoutes( this.router ) );
     }
     set404Handler(){
-        this.app.use((req, res) => {
-            const notFound = new NotFound('not found');
-            res.status(notFound.status).json({ status: 'Error', message: notFound.message, data: null, errors: notFound.errors });
-        });
+        this.app.use( ( req, res ) => {
+            const notFound = new NotFound( 'not found' );
+            res.status( notFound.status ).json( { status: 'Error', message: notFound.message, data: null, errors: notFound.errors } );
+        } );
     }
     setErrorHandler() {
-        this.app.use((error, req, res, next) => {
+        this.app.use( ( error, req, res, next ) => {
             // eslint-disable-next-line no-console
-            console.log(error.message);
-            res.status(error.status||500).json({ status: 'Error', message: error.message, data: null, errors: error.errors });
-        });
+            console.log( error.message );
+            res.status( error.status||500 ).json( { status: 'Error', message: error.message, data: null, errors: error.errors } );
+            next();
+        } );
     }
 }
 

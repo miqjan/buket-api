@@ -36,8 +36,7 @@
         ],
         "space-in-parens": [
             "error", 
-            "always", 
-            { "exceptions": ["[]"] }
+            "always"
         ],
         "constructor-super": 2,
         "no-case-declarations": 2,
