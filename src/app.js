@@ -92,7 +92,6 @@ class Application {
             // eslint-disable-next-line no-console
             console.log( error.message );
             res.status( error.status||500 ).json( { status: 'Error', message: error.message, data: null, errors: error.errors } );
-            next();
         } );
     }
 }
