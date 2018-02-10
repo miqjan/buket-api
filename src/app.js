@@ -84,14 +84,14 @@ class Application {
     set404Handler(){
         this.app.use((req, res) => {
             const notFound = new NotFound('not found');
-            res.status(notFound.status).json({status: 'Error', message: notFound.message, data: null, errors: notFound.errors});
+            res.status(notFound.status).json({ status: 'Error', message: notFound.message, data: null, errors: notFound.errors });
         });
     }
     setErrorHandler() {
-        this.app.use((error, req, res) => {
+        this.app.use((error, req, res, next) => {
             // eslint-disable-next-line no-console
             console.log(error.message);
-            res.status(error.status||500).json({status: 'Error', message: error.message, data: null, errors: error.errors });
+            res.status(error.status||500).json({ status: 'Error', message: error.message, data: null, errors: error.errors });
         });
     }
 }

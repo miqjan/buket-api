@@ -9,16 +9,16 @@ const Schema = mongoose.Schema;
 
 
 let UserSchema = new Schema({
-    firstname: {type: String},
-    lastname: {type: String},
-    email: {type: {address:String,status:{type:Boolean,default:false},qnfirm_key:{type:String,default:null}}},
-    phone: {type: {number:String,status:{type:Boolean,default:false},qnfirm_key:{type:String,default:null}}},
-    create_at: {type: Date, default: Date.now},
-    type: {type:Number, default: 0},
-    password: {type: String},
-    remember_key: {type: String, default: null},
-    removed: {type: Boolean, default: false},
-    delivery_book:{type:{
+    firstname: { type: String },
+    lastname: { type: String },
+    email: { type: { address:String,status:{ type:Boolean,default:false },qnfirm_key:{ type:String,default:null } } },
+    phone: { type: { number:String,status:{ type:Boolean,default:false },qnfirm_key:{ type:String,default:null } } },
+    create_at: { type: Date, default: Date.now },
+    type: { type:Number, default: 0 },
+    password: { type: String },
+    remember_key: { type: String, default: null },
+    removed: { type: Boolean, default: false },
+    delivery_book:{ type:{
         firstname: String,
         lastname: String,
         phone : String,
@@ -26,21 +26,21 @@ let UserSchema = new Schema({
         region: String,
         city_village:String,
         address:String,
-        zip_postcode:{type:String,default:null},
-    },default:null},
-    past_orders:{type:[{
+        zip_postcode:{ type:String,default:null },
+    },default:null },
+    past_orders:{ type:[{
         delivery_id:String,
         price:String,
-        product:{type:[{
+        product:{ type:[{
             id:String,
             name:String,
             price:String,
-            count_item: {type: Number,default: 1},
+            count_item: { type: Number,default: 1 },
             count:Number,
             status:{ type: Number, min: 0, max: 4 },
         }]},
-        removed: {type: Boolean, default: false},
-    }],default:null},
+        removed: { type: Boolean, default: false },
+    }],default:null },
 });
 let UserConstruct = mongoose.model('UserSchema', UserSchema);
 
