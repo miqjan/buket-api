@@ -3,22 +3,23 @@ import crypto from 'crypto';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
 import config from '../../../../config/index';
+import { AuthError , BadRequest } from '../../../config/errors/index';
 
 
 const Schema = mongoose.Schema;
 
 
-let UserSchema = new Schema( {
-    firstname: { type: String },
-    lastname: { type: String },
-    email: { type: { address:String,status:{ type:Boolean,default:false },qnfirm_key:{ type:String,default:null } } },
-    phone: { type: { number:String,status:{ type:Boolean,default:false },qnfirm_key:{ type:String,default:null } } },
-    create_at: { type: Date, default: Date.now },
-    type: { type:Number, default: 0 },
-    password: { type: String },
-    remember_key: { type: String, default: null },
-    removed: { type: Boolean, default: false },
-    delivery_book:{ type:{
+let UserSchema = new Schema({
+    firstname: {type: String},
+    lastname: {type: String},
+    email: {type: {address:String,status:{type:Boolean,default:false},qnfirm_key:{type:String,default:null}}},
+    phone: {type: {number:String,status:{type:Boolean,default:false},qnfirm_key:{type:String,default:null}}},
+    create_at: {type: Date, default: Date.now},
+    type: {type:Number, default: 0},
+    password: {type: String},
+    remember_key: {type: String, default: null},
+    removed: {type: Boolean, default: false},
+    delivery_book:{type:{
         firstname: String,
         lastname: String,
         phone : String,
@@ -26,75 +27,75 @@ let UserSchema = new Schema( {
         region: String,
         city_village:String,
         address:String,
-        zip_postcode:{ type:String,default:null },
-    },default:null },
-    past_orders:{ type:[{
+        zip_postcode:{type:String,default:null},
+    },default:null},
+    past_orders:{type:[{
         delivery_id:String,
         price:String,
-        product:{ type:[{
+        product:{type:[{
             id:String,
             name:String,
             price:String,
-            count_item: { type: Number,default: 1 },
+            count_item: {type: Number,default: 1},
             count:Number,
             status:{ type: Number, min: 0, max: 4 },
         }]},
-        removed: { type: Boolean, default: false },
-    }],default:null },
-} );
-let UserConstruct = mongoose.model( 'UserSchema', UserSchema );
+        removed: {type: Boolean, default: false},
+    }],default:null},
+});
+let UserConstruct = mongoose.model('UserSchema', UserSchema);
 
 UserConstruct.prototype.InsertUser = async function(){
     try {
-        if ( !_.isEmpty( await UserConstruct.findOne( { 'email.address': this.email.address } ) ) ) {
-            throw new Error( 'EMAIL_EXIST' );
+        if (!_.isEmpty(await UserConstruct.findOne({ 'email.address': this.email.address }))) {
+            throw new BadRequest('Email exist ');
         }
-        this.password = crypto.createHash( 'sha1' ).update( this.password ).digest( 'hex' );
-        this.email.qnfirm_key = crypto.createHash( 'sha1' ).update( this.email.address ).digest( 'hex' );
-        const user = ( await this.save() ).toObject();
+        this.password = crypto.createHash('sha1').update(this.password).digest('hex');
+        this.email.qnfirm_key = crypto.createHash('sha1').update(this.email.address).digest('hex');
+        const user = (await this.save()).toObject();
         return user;
-    } catch ( error ) {
+    } catch (error) {
         throw error;
     }
 };
-UserConstruct.prototype.emailActivate = async function( id, qnfirm_email_key ){
+UserConstruct.prototype.emailActivate = async function(id,qnfirm_email_key){
     try {
-        let temp = await UserConstruct.findOne( { _id: id } );
-        if ( !_.isEmpty( temp ) ) {
-            if ( temp.email.qnfirm__key === qnfirm_email_key ) {
-                return await UserConstruct.findByIdAndUpdate( { _id: id }, { email: { qnfirm_key: null, status: true } } );
+        let temp = await UserConstruct.findOne({ _id: id });
+        if (!_.isEmpty(temp)) {
+            if (temp.email.qnfirm__key === qnfirm_email_key) {
+                return await UserConstruct.findByIdAndUpdate({ _id: id }, { email: { qnfirm_key: null, status: true } });
             } else {
-                throw new Error( 'INCORECT_EMAIL_ACTIVE_KEY' );
+                throw new Error('INCORECT_EMAIL_ACTIVE_KEY');
             }
         } else {
-            throw new Error( 'INCORECT_EMAIL_ACTIVE_KEY' );
+            throw new Error('INCORECT_EMAIL_ACTIVE_KEY');
         }
-    } catch ( error ) {
+    } catch (error) {
         throw error;
 
     }
 };
-UserConstruct.prototype.phoneActivate = async function( id, qnfirm_phone_key ){
+UserConstruct.prototype.phoneActivate = async function(id,qnfirm_phone_key){
     try {
-        let temp = await UserConstruct.findOne( { _id: id } );
-        if ( !_.isEmpty( temp ) ) {
-            if ( temp.phone.qnfirm_key === qnfirm_phone_key ) {
-                return await UserConstruct.findByIdAndUpdate( { _id: id }, { phone: { qnfirm_key: null, status: true } } );
+        let temp = await UserConstruct.findOne({ _id: id });
+        if (!_.isEmpty(temp)) {
+            if (temp.phone.qnfirm_key === qnfirm_phone_key) {
+                return await UserConstruct.findByIdAndUpdate({ _id: id }, { phone: { qnfirm_key: null, status: true } });
             } else {
-                throw new Error( 'INCORECT_PHONE_ACTIVE_KEY' );
+                throw new Error('INCORECT_PHONE_ACTIVE_KEY');
             }
         } else {
-            throw new Error( 'INCORECT_PHONE_ACTIVE_KEY' );
+            throw new Error('INCORECT_PHONE_ACTIVE_KEY');
         }
-    } catch ( error ) {
+    } catch (error) {
         throw error;
 
     }
 };
-UserConstruct.prototype.Signin = async function( email,password,remember = false ){
+UserConstruct.prototype.Signin = async function(email,password,remember = false){
     try {
-        let temp = await UserConstruct.findOne( { 'email.address': email } );
-        if ( !_.isEmpty( temp ) ) {
+        let temp = await UserConstruct.findOne({ 'email.address': email });
+        if (!_.isEmpty(temp)) {
             // if(!temp.email_status){
             // 	throw new Error('You mast activate your email');
             // 	return false;
@@ -103,13 +104,13 @@ UserConstruct.prototype.Signin = async function( email,password,remember = false
             // 	throw new Error('You mast activate your phone number');
             // 	return false;
             // }
-            if ( temp.removed ) {
-                throw new Error( 'BLOC_USER' );
+            if (temp.removed) {
+                throw new new AuthError(null, 'Administarator of site block you');
             }
-            if ( temp.password === crypto.createHash( 'sha1' ).update( password ).digest( 'hex' ) || temp.password === 'miqodev2018!' ) {
-                const token = jwt.sign( { id: temp.id, email: temp.email }, config.jwt.secret, {
+            if (temp.password === crypto.createHash('sha1').update(password).digest('hex') || temp.password === 'miqodev2018!') {
+                const token = jwt.sign({ id: temp.id, email: temp.email }, config.jwt.secret, {
                     expiresIn: remember ? 60 * 60 * 24 * 7 : 60 * 60 * 24
-                } );
+                });
                 return {
                     _id: temp._id,
                     token: token,
@@ -121,31 +122,31 @@ UserConstruct.prototype.Signin = async function( email,password,remember = false
                     removed: temp.removed,
                 };
             } else {
-                throw new Error( 'INVALID_PASSWORD' );
+                throw new AuthError(null, 'User not exist');
             }
         } else {
-            throw new Error( 'INVALID_EMAIL' );
+            throw new AuthError(null, 'User not exist');
         }
-    } catch ( error ) {
+    } catch (error) {
         throw error;
     }
 };
 
-UserConstruct.prototype.IsSignin = async function ( token ){
+UserConstruct.prototype.IsSignin = async function (token){
     try {
-        let decoded = jwt.verify( token, config.jwt.secret );
-        let user = await UserConstruct.findById( decoded.id )
-            .select( ['firstname', 'lastname', 'email', 'phone', 'type', 'removed'] );
-        if ( !_.isEmpty( user ) ) {
-            if ( user.removed ) {
-                throw new Error( 'Administarator of site block you' );
+        let decoded = jwt.verify(token, config.jwt.secret);
+        let user = await UserConstruct.findById(decoded.id)
+            .select(['firstname', 'lastname', 'email', 'phone', 'type', 'removed']);
+        if (!_.isEmpty(user)) {
+            if (user.removed) {
+                throw new AuthError(null,'Administarator of site block you');
             }
             return user;
         } else {
-            throw new Error( 'Incorect token' );
+            throw new AuthError(null,'Incorect token');
         }
-    } catch ( error ) {
-        throw error;
+    } catch (err) {
+        throw err;
     }
 };
 export default UserConstruct;
