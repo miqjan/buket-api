@@ -34,6 +34,10 @@
             "error",
             "always"
         ],
+        "space-in-parens": [
+            "error", 
+            "always"
+        ],
         "constructor-super": 2,
         "no-case-declarations": 2,
         "no-class-assign": 2,

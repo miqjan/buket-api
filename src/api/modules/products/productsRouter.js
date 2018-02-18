@@ -1,5 +1,5 @@
 import controller from './productsController';
-import {checkAuthentication,MustBeSuperAdmin} from '../auth/helpers';
+import { checkAuthentication,MustBeSuperAdmin } from '../auth/helpers';
 
 export default router => {
 
