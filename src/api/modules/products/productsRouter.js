@@ -11,6 +11,10 @@ export default router => {
 
     router.get('/:categoryId', controller.getProductsByCategory);
 
+    router.post('/byIds', controller.getProductsByIds);
+
+    router.get('/byId/:id', controller.getProductById);
+
     //router.post("/test",controller.test);
 
     // router.post("/sign-out", controller.signOut);

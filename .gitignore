@@ -61,3 +61,4 @@ typings/
 .idea/
 .vscode/
 config/index.js
+package-lock.json

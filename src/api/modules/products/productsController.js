@@ -18,6 +18,31 @@ export default class ProductsController {
             return next( new BadRequest( error ) );
         } 
     }
+    static async getProductsByIds( req, res, next ){
+        req.checkBody( 'idsArray', 'idsArray is Empty' ).notEmpty();
+        try {
+            await req.asyncValidationErrors();
+            const products = await ProductsModel.find({ _id: { '$in': req.body.idsArray} }).exec();
+            console.log(req.body.idsArray);
+            responseHandler( res, 'SUCCESS', products.reduce((obj,product)=>{ //array of obect to obect of object
+                obj[product.id] = product; 
+                return obj;
+            }, {}), null );
+        } catch ( error ) {
+
+            return next( new ValidationError( error ) );
+        } 
+    }
+    static async getProductById( req, res, next ){
+        req.checkParams( 'id', 'incorect product id' ).notEmpty().isMongoId();
+        try {
+            await req.asyncValidationErrors();
+            const product = await ProductsModel.findOne(req.params.id).exec();
+            responseHandler( res, 'SUCCESS', product, null );
+        } catch ( error ) {
+            return next( new ValidationError( error ) );
+        } 
+    }
     static async getProductsByCategory ( req,res,next ) {
         req.checkParams( 'categoryId', 'incorect category id' ).notEmpty().isMongoId();
         if( req.query.limit ){
