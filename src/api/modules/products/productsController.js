@@ -23,7 +23,6 @@ export default class ProductsController {
         try {
             await req.asyncValidationErrors();
             const products = await ProductsModel.find({ _id: { '$in': req.body.idsArray} }).exec();
-            console.log(req.body.idsArray);
             responseHandler( res, 'SUCCESS', products.reduce((obj,product)=>{ //array of obect to obect of object
                 obj[product.id] = product; 
                 return obj;

@@ -7,6 +7,7 @@ import expressValidator  from 'express-validator';
 import enableRoutes from './api';
 import config from '../config';
 import { NotFound, ValidationError } from './config/errors';
+import { validPassword } from './api/helpers/cusomValidators';
 import * as _ from 'lodash';
 
 
@@ -32,6 +33,9 @@ class Application {
                 errorFormatter: (param, msg, value, location)=>{
                     return {param: param, message: msg, value: value, location: location};
                 },
+                customValidators: {
+                    validPassword,
+                }
             }
         ));
         this.app.use((req,res,next)=>{

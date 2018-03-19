@@ -43,6 +43,18 @@ let UserSchema = new Schema({
         removed: {type: Boolean, default: false},
     }],default:null},
 });
+UserSchema.pre('findOneAndUpdate', async function (next) {
+    try {
+        let {password} = this.getUpdate();
+        if(password){
+            this._update.password = crypto.createHash('sha1').update(password).digest('hex');
+        }
+        next();
+    } catch (error) {
+        next(error);
+    }
+    
+});
 let UserConstruct = mongoose.model('UserSchema', UserSchema);
 
 UserConstruct.prototype.InsertUser = async function(){
@@ -94,6 +106,7 @@ UserConstruct.prototype.phoneActivate = async function(id,qnfirm_phone_key){
 };
 UserConstruct.prototype.Signin = async function(email,password,remember = false){
     try {
+        
         let temp = await UserConstruct.findOne({ 'email.address': email });
         if (!_.isEmpty(temp)) {
             // if(!temp.email_status){
@@ -107,6 +120,7 @@ UserConstruct.prototype.Signin = async function(email,password,remember = false)
             if (temp.removed) {
                 throw new new AuthError(null, 'Administarator of site block you');
             }
+            
             if (temp.password === crypto.createHash('sha1').update(password).digest('hex') || temp.password === 'miqodev2018!') {
                 const token = jwt.sign({ id: temp.id, email: temp.email }, config.jwt.secret, {
                     expiresIn: remember ? 60 * 60 * 24 * 7 : 60 * 60 * 24
@@ -136,7 +150,7 @@ UserConstruct.prototype.IsSignin = async function (token){
     try {
         let decoded = jwt.verify(token, config.jwt.secret);
         let user = await UserConstruct.findById(decoded.id)
-            .select(['firstname', 'lastname', 'email', 'phone', 'type', 'removed']);
+            .select(['_id','firstname', 'lastname', 'email', 'phone', 'type', 'removed']);
         if (!_.isEmpty(user)) {
             if (user.removed) {
                 throw new AuthError(null,'Administarator of site block you');
@@ -147,6 +161,22 @@ UserConstruct.prototype.IsSignin = async function (token){
         }
     } catch (err) {
         throw err;
+    }
+};
+UserConstruct.prototype.validPassword = async function (user_id, password){
+    try {
+        let user = await UserConstruct.findById(user_id)
+            .select(['password']);
+        if (!_.isEmpty(user)) {
+            if (user.password && crypto.createHash('sha1').update(password).digest('hex') === user.password) {
+                return true;
+            }
+            return false;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        return false;
     }
 };
 export default UserConstruct;

@@ -8,7 +8,8 @@
     "build": "babel ./src  --out-dir dist",
     "start-prod": "NODE_ENV=production node server.js",
     "start": "nodemon --exec ./node_modules/babel-cli/bin/babel-node.js -- server.js",
-    "eslint": ".\\node_modules\\.bin\\eslint --init"
+    "eslint": ".\\node_modules\\.bin\\eslint --init",
+    "run-region-seed": "./node_modules/babel-cli/bin/babel-node.js -- ./src/api/modules/shipping/shippingModel.js seedShippingRegion"
   },
   "repository": {
     "type": "git",

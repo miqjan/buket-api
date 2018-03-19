@@ -20,7 +20,7 @@ export default class AuthController {
 
         req.checkBody('password', 'Password cannot be blank.').notEmpty();
         req.checkBody('password', 'Password must be longer than 6 characters.').len({min: 6});
-
+        
         req.sanitizeBody('email').normalizeEmail({gmail_remove_dots: false});
         try {
             let remeber = req.body.remeber || false;
