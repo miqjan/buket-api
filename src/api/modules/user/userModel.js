@@ -19,16 +19,16 @@ let UserSchema = new Schema({
     password: {type: String},
     remember_key: {type: String, default: null},
     removed: {type: Boolean, default: false},
-    delivery_book:{type:{
+    delivery_book:{type:[{
         firstname: String,
         lastname: String,
         phone : String,
         country: String,
-        region: String,
+        region: [{type: Schema.Types.ObjectId, ref: 'ShippingSchema'}],
         city_village:String,
         address:String,
         zip_postcode:{type:String,default:null},
-    },default:null},
+    }],default:null},
     past_orders:{type:[{
         delivery_id:String,
         price:String,
