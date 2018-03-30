@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import path from 'path';
 import expressValidator  from 'express-validator';
+import logger from 'morgan';
 
 import enableRoutes from './api';
 import config from '../config';
@@ -44,6 +45,9 @@ class Application {
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
             next();
         });
+        if(process.env.NODE_ENV !== 'production'){
+            this.app.use(logger('dev'));
+        }
         this.app.use(express.static(path.join(__dirname,'../','public')));
     }
 

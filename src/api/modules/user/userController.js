@@ -89,7 +89,7 @@ export default class ShippingController {
                     update['delivery_book.$.'+key] = body[key];
                 } 
             });
-            const result = await UserModel.findOneAndUpdate({'delivery_book_id': req.params.id},update,{new: true}).populate({
+            const result = await UserModel.findOneAndUpdate({'delivery_book._id': req.params.id},update,{new: true}).populate({
                 path: 'delivery_book.region',
                 options: { limit: 1 }
             }).select('delivery_book').exec();
