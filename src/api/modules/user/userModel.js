@@ -18,6 +18,7 @@ let UserSchema = new Schema({
     type: {type:Number, default: 0},
     password: {type: String},
     remember_key: {type: String, default: null},
+    stripe: {type: String, default: null},
     removed: {type: Boolean, default: false},
     delivery_book:{type:[{
         firstname: String,
