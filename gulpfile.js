@@ -59,7 +59,7 @@ gulp.task('go-to-branch', (cb) => {
 })
 
 gulp.task('docker-login', (cb) => {
-    exec('$(docker login --username dockerrepobuket --password-stdin)', err => cb(err))
+    exec('$(docker login --username dockerrepobuket --password 55855771jasojan)', err => cb(err))
 })
 
 gulp.task('docker-build', ['remove-package-lock', 'update-package-modules', 'docker-login'], (cb) => {
