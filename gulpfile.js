@@ -72,7 +72,7 @@ gulp.task('docker-tag', ['docker-build'], (cb) => {
 })
 
 gulp.task('docker-push', ['docker-tag'], (cb) => {
-    let image = `802285420673.dkr.ecr.us-west-1.amazonaws.com/${package.name}:${argv.branch}`;
+    let image = `${package.name}:${argv.branch}`;
     exec(`docker push ${image}${package.version} && docker push ${image}.latest`, err => cb(err))
     console.log("======================= PUSHED IMAGES ===========================");
     console.log(`IMAGE: ${image}${package.version}`);
