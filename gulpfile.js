@@ -67,7 +67,7 @@ gulp.task('docker-build', ['remove-package-lock', 'update-package-modules', 'doc
 })
 
 gulp.task('docker-tag', ['docker-build'], (cb) => {
-    let tag = `docker tag ${package.name} ${package.name}:${argv.branch}`;
+    let tag = `docker tag ${package.name} dockerrepobuket/${package.name}:${argv.branch}`;
     exec(`${tag}${package.version} && ${tag}.latest`, err => cb(err))
 })
 
