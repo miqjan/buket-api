@@ -73,7 +73,7 @@ gulp.task('docker-tag', ['docker-build'], (cb) => {
 
 gulp.task('docker-push', ['docker-tag'], (cb) => {
     let image = `${package.name}:${argv.branch}`;
-    exec(`docker push ${image}${package.version} && docker push ${image}.latest`, err => cb(err))
+    exec(`docker push dockerrepobuket/${image}${package.version} && docker push dockerrepobuket/${image}.latest`, err => cb(err))
     console.log("======================= PUSHED IMAGES ===========================");
     console.log(`IMAGE: ${image}${package.version}`);
     console.log(`IMAGE: ${image}.latest`);
